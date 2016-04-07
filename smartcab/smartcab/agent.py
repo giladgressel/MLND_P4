@@ -24,11 +24,14 @@ class LearningAgent(Agent):
 
         # TODO: Update state
 
+        self.state = (inputs,self.next_waypoint,deadline)
+
         
         # TODO: Select action according to your policy
         random_action = random.choice(self.env.valid_actions)
+
         action = random_action
-        
+
 
 
         # Execute action and get reward
@@ -48,7 +51,7 @@ def run():
     e.set_primary_agent(a, enforce_deadline=False)  # set agent to track
 
     # Now simulate it
-    sim = Simulator(e, update_delay=1.0)  # reduce update_delay to speed up simulation
+    sim = Simulator(e, update_delay=.5)  # reduce update_delay to speed up simulation
     sim.run(n_trials=10)  # press Esc or close pygame window to quit
 
 
