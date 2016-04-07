@@ -23,9 +23,13 @@ class LearningAgent(Agent):
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
+
         
         # TODO: Select action according to your policy
-        action = None
+        random_action = random.choice(self.env.valid_actions)
+        action = random_action
+        
+
 
         # Execute action and get reward
         reward = self.env.act(self, action)
