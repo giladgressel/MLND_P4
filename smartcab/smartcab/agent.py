@@ -24,12 +24,12 @@ class LearningAgent(Agent):
 
         # TODO: Update state
 
-        self.state = (inputs,self.next_waypoint,deadline)
+        #self.state = {"next waypoint" : self.next_waypoint, "Time Left" : deadline, "Inputs" : inputs}
+        self.state = [('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint)]
 
         
         # TODO: Select action according to your policy
-        random_action = random.choice(self.env.valid_actions)
-
+        random_action = random.choice(self.env.valid_actions[1:])
         action = random_action
 
 
