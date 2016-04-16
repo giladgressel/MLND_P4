@@ -94,7 +94,7 @@ def run():
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(LearningAgent)  # create agent
     e.set_primary_agent(a, enforce_deadline=True)  # set agent to track
-g
+
     # Now simulate it
     sim = Simulator(e, update_delay=1.0)  # reduce update_delay to speed up simulation
     sim.run(n_trials=100)  # press Esc or close pygame window to quit
