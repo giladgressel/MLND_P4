@@ -25,12 +25,14 @@ class LearningAgent(Agent):
         # TODO: Update state
 
         #self.state = {"next waypoint" : self.next_waypoint, "Time Left" : deadline, "Inputs" : inputs}
-        self.state = [('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint)]
+
+        #this state will act as a key in the Q-table dictionary
+        self.state = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
 
         
         # TODO: Select action according to your policy
         random_action = random.choice(self.env.valid_actions[1:])
-        action = random_action
+        action = self.next_waypoint
 
 
 
@@ -38,6 +40,27 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
+        inputs_2 = self.env.sense(self)
+        deadline_2 = self.env.get_deadline(self)
+        state_2 = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
+
+        valid_actions = self.env.valid_actions
+        #dictionary with states as keys, each state has four valid actions as nested dictionary.  each action contains the q-value, for that state/action pair
+        q_table = {}
+
+        def Q_Value (state, action):
+            if state in q_table:
+                return q_table[state][action]
+            else:
+                possible_actions = {possible_action: 0 for possible_action in valid_actions }
+                q_table[state] = possible_actions
+            return q_table[state][action]
+
+
+        def update_Q_table (state, action, prize, alpha, gamma):
+            (1-alpha) * Q_Value(state, action) + alpha * (prize + gamma * MAX_Q(state, action))
+
+
 
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
