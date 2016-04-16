@@ -22,18 +22,14 @@ class LearningAgent(Agent):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
 
-
-    def Q_Value (self, state, action):
-        if state in self.Q_table:
-            return self.Q_table[state][action]
-        else:
-            possible_actions = {possible_action: 0 for possible_action in self.valid_actions }
-            self.Q_table[state] = possible_actions
-        return self.Q_table[state][action]
+    #intialize all possible actions for a particular state in the Q-table.  Set = 0
+    def init_Q_Values (self, state):
+        possible_actions = {possible_action: 0 for possible_action in self.valid_actions }
+        self.Q_table[state] = possible_actions
 
     #for the current state, iterates over all possible actions and returns the action which maximizes the Q value
     def ArgMAX_Q (self, state):
-        
+
         return max(self.Q_table[state].iteritems(), key= lambda x : x[1])
 
 
@@ -44,7 +40,7 @@ class LearningAgent(Agent):
 
 
     def update(self, t):
-        # Gather inputs
+        # Gather inputs   --- sense the environment
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)
@@ -54,13 +50,15 @@ class LearningAgent(Agent):
         #this state will act as a key in the Q-table dictionary
         self.state = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
 
+        #initialize the state into the Q_table will do nothing if it's already there.
+        if self.state not in self.Q_table:
+            self.init_Q_Values(self.state)
+
         
         # TODO: Select action according to your policy
         # random_action = random.choice(self.env.valid_actions[1:])
 
         action = self.ArgMAX_Q(self.state)
-
-
 
         # Execute action and get reward
         reward = self.env.act(self, action)
@@ -71,14 +69,13 @@ class LearningAgent(Agent):
         inputs_2 = self.env.sense(self)
         deadline -= 1  #we have to force this because the deadline only updates with env.step(), it won't update from env.act().
         self.next_waypoint = self.planner.next_waypoint()
-        state_2 = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
+        state_2 = (('time_left', deadline), ('light', inputs_2['light'] ), ('next_waypoint', self.next_waypoint))
 
+        # Q-learning Variables
+        alpha = 0
+        gamma = 0
 
-
-
-
-        def update_Q_table (state_1, state_2, action_1, action_2, prize, alpha, gamma):
-            new_q = (1-alpha) * Q_Value(state_1, action_1) + alpha * (prize + gamma * MAX_Q(state_2, action_2))
+        self.Q_table[self.state][action] = (1-alpha) * self.Q_table[self.state][action] + alpha * (reward + gamma * self.MAX_Q(state_2))
 
 
 
