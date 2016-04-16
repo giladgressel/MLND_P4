@@ -3,6 +3,7 @@ from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
 
+
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
 
@@ -10,11 +11,37 @@ class LearningAgent(Agent):
         super(LearningAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color
         self.color = 'red'  # override color
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
+
         # TODO: Initialize any additional variables here
+        #dictionary with states as keys, each state has four valid actions as nested dictionary.  each action contains the q-value, for that state/action pair
+        self.Q_table = {}
+        self.valid_actions = self.env.valid_actions
+
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
+
+
+    def Q_Value (self, state, action):
+        if state in self.Q_table:
+            return self.Q_table[state][action]
+        else:
+            possible_actions = {possible_action: 0 for possible_action in self.valid_actions }
+            self.Q_table[state] = possible_actions
+        return self.Q_table[state][action]
+
+    #for the current state, iterates over all possible actions and returns the action which maximizes the Q value
+    def ArgMAX_Q (self, state):
+        
+        return max(self.Q_table[state].iteritems(), key= lambda x : x[1])
+
+
+    #for the current state, iterates over all possible actions and returns the largest Q value
+    def MAX_Q (self, state):
+        return max(self.Q_table[state].values())
+
+
 
     def update(self, t):
         # Gather inputs
@@ -24,15 +51,14 @@ class LearningAgent(Agent):
 
         # TODO: Update state
 
-        #self.state = {"next waypoint" : self.next_waypoint, "Time Left" : deadline, "Inputs" : inputs}
-
         #this state will act as a key in the Q-table dictionary
         self.state = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
 
         
         # TODO: Select action according to your policy
-        random_action = random.choice(self.env.valid_actions[1:])
-        action = self.next_waypoint
+        # random_action = random.choice(self.env.valid_actions[1:])
+
+        action = self.ArgMAX_Q(self.state)
 
 
 
@@ -40,25 +66,19 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action)
 
         # TODO: Learn policy based on state, action, reward
+
+        #sense environment again,  in order to update Q_table.
         inputs_2 = self.env.sense(self)
-        deadline_2 = self.env.get_deadline(self)
+        deadline -= 1  #we have to force this because the deadline only updates with env.step(), it won't update from env.act().
+        self.next_waypoint = self.planner.next_waypoint()
         state_2 = (('time_left', deadline), ('light', inputs['light'] ), ('next_waypoint', self.next_waypoint))
 
-        valid_actions = self.env.valid_actions
-        #dictionary with states as keys, each state has four valid actions as nested dictionary.  each action contains the q-value, for that state/action pair
-        q_table = {}
-
-        def Q_Value (state, action):
-            if state in q_table:
-                return q_table[state][action]
-            else:
-                possible_actions = {possible_action: 0 for possible_action in valid_actions }
-                q_table[state] = possible_actions
-            return q_table[state][action]
 
 
-        def update_Q_table (state, action, prize, alpha, gamma):
-            (1-alpha) * Q_Value(state, action) + alpha * (prize + gamma * MAX_Q(state, action))
+
+
+        def update_Q_table (state_1, state_2, action_1, action_2, prize, alpha, gamma):
+            new_q = (1-alpha) * Q_Value(state_1, action_1) + alpha * (prize + gamma * MAX_Q(state_2, action_2))
 
 
 
