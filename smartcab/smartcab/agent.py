@@ -29,8 +29,7 @@ class LearningAgent(Agent):
 
     #for the current state, iterates over all possible actions and returns the action which maximizes the Q value
     def ArgMAX_Q (self, state):
-
-        return max(self.Q_table[state].iteritems(), key= lambda x : x[1])
+        return max(self.Q_table[state].iteritems(), key= lambda x : x[1])[0]
 
 
     #for the current state, iterates over all possible actions and returns the largest Q value
@@ -60,6 +59,7 @@ class LearningAgent(Agent):
 
         action = self.ArgMAX_Q(self.state)
 
+
         # Execute action and get reward
         reward = self.env.act(self, action)
 
@@ -71,15 +71,20 @@ class LearningAgent(Agent):
         self.next_waypoint = self.planner.next_waypoint()
         state_2 = (('time_left', deadline), ('light', inputs_2['light'] ), ('next_waypoint', self.next_waypoint))
 
+        #initialize the new state into the Q_table will do nothing if it's already there.
+        if state_2 not in self.Q_table:
+            self.init_Q_Values(state_2)
+
+
         # Q-learning Variables
-        alpha = 0
-        gamma = 0
+        alpha = .05
+        gamma = .5
 
         self.Q_table[self.state][action] = (1-alpha) * self.Q_table[self.state][action] + alpha * (reward + gamma * self.MAX_Q(state_2))
 
 
 
-        print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
+        #print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
 
 def run():
@@ -88,11 +93,11 @@ def run():
     # Set up environment and agent
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(LearningAgent)  # create agent
-    e.set_primary_agent(a, enforce_deadline=False)  # set agent to track
-
+    e.set_primary_agent(a, enforce_deadline=True)  # set agent to track
+g
     # Now simulate it
-    sim = Simulator(e, update_delay=3.0)  # reduce update_delay to speed up simulation
-    sim.run(n_trials=10)  # press Esc or close pygame window to quit
+    sim = Simulator(e, update_delay=1.0)  # reduce update_delay to speed up simulation
+    sim.run(n_trials=100)  # press Esc or close pygame window to quit
 
 
 if __name__ == '__main__':
