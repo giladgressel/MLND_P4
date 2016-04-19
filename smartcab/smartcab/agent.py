@@ -106,18 +106,21 @@ def run():
     e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials+    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
 
-    #initiliaze file for CSV logging
-    with open('smartCabLog.txt', 'ab') as log:
-        log.write("\n-----------------------------------")
-        log.write("\nAlpha is set to {}".format(a.alpha))
-        log.write("\nGamma is set to {}".format(a.gamma))
-
     # Now simulate it
     sim = Simulator(e, update_delay=0.0, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials=100)  # run for a specified number of trials
+    sim.run(n_trials=1000)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
+
+    #logging
+    with open('smartCabLog.txt', 'ab') as log:
+        log.write("\n-----------------------------------")
+        log.write("\nAlpha is set to {}".format(a.alpha))
+        log.write("\nGamma is set to {}".format(a.gamma))
+        log.write("\nThe agent FAILED : {} times".format(e.agent_ran_out_time))
+        log.write("\nThe agent SUCCEEDED : {} times".format(e.agent_reached_in_time))
+        log.write("\nSuccess rate of : {}".format(e.agent_reached_in_time/float(e.agent_reached_in_time+e.agent_ran_out_time)))
 
 
 if __name__ == '__main__':

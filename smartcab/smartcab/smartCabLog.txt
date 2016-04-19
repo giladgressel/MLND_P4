@@ -6,3 +6,33 @@ Gamma is set to 0.5
 -----------------------------------
 Alpha is set to 0.05
 Gamma is set to 0.5
+-----------------------------------
+Alpha is set to 0.05
+Gamma is set to 0.5
+The agent FAILED : 0 times
+The agent SUCCEEDED : 100 times
+Success rate of : 1
+-----------------------------------
+Alpha is set to 0.05
+Gamma is set to 0.5
+The agent FAILED : 59 times
+The agent SUCCEEDED : 41 times
+Success rate of : 0.41
+-----------------------------------
+Alpha is set to 0.05
+Gamma is set to 0.5
+The agent FAILED : 53 times
+The agent SUCCEEDED : 47 times
+Success rate of : 0.47
+-----------------------------------
+Alpha is set to 0.05
+Gamma is set to 0.5
+The agent FAILED : 0 times
+The agent SUCCEEDED : 100 times
+Success rate of : 1.0
+-----------------------------------
+Alpha is set to 0.05
+Gamma is set to 0.5
+The agent FAILED : 590 times
+The agent SUCCEEDED : 410 times
+Success rate of : 0.41
