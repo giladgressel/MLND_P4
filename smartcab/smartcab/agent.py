@@ -18,6 +18,13 @@ class LearningAgent(Agent):
         self.valid_actions = self.env.valid_actions
 
 
+        #Q learning parameters
+        self.gamma = .5
+        self.alpha = .05
+
+        #csv file title name
+        self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
+
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
@@ -79,11 +86,9 @@ class LearningAgent(Agent):
             self.init_Q_Values(state_2)
 
 
-        # Q-learning Variables
-        alpha = .05
-        gamma = .5
-
-        self.Q_table[self.state][action] = (1-alpha) * self.Q_table[self.state][action] + alpha * (reward + gamma * self.MAX_Q(state_2))
+        # Q-learning
+        self.Q_table[self.state][action] = (1-self.alpha) * self.Q_table[self.state][action] \
+                                           + self.alpha * (reward + self.gamma * self.MAX_Q(state_2))
 
 
 
@@ -94,14 +99,20 @@ class LearningAgent(Agent):
 def run():
     """Run the agent for a finite number of trials."""
 
+
     # Set up environment and agent
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(LearningAgent)  # create agent
     e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials+    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
 
+    #initiliaze file for CSV logging
+    with open(a.trial_parameters+'.txt', 'wb') as log:
+        log.write("Alpha is set to {}".format(a.alpha))
+        log.write("Gamma is set to {}".format(a.gamma))
+
     # Now simulate it
-    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=0.0, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
