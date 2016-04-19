@@ -107,9 +107,10 @@ def run():
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials+    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
 
     #initiliaze file for CSV logging
-    with open(a.trial_parameters+'.txt', 'wb') as log:
-        log.write("Alpha is set to {}".format(a.alpha))
-        log.write("Gamma is set to {}".format(a.gamma))
+    with open('smartCabLog.txt', 'ab') as log:
+        log.write("\n-----------------------------------")
+        log.write("\nAlpha is set to {}".format(a.alpha))
+        log.write("\nGamma is set to {}".format(a.gamma))
 
     # Now simulate it
     sim = Simulator(e, update_delay=0.0, display=False)  # create simulator (uses pygame when display=True, if available)
