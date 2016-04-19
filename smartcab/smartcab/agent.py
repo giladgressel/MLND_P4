@@ -2,6 +2,7 @@ import random
 from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
+import csv
 
 
 class LearningAgent(Agent):
@@ -19,15 +20,29 @@ class LearningAgent(Agent):
 
 
         #Q learning parameters
-        self.gamma = .5
-        self.alpha = .05
+        self.gamma = .05
+        self.alpha = .5
+
 
         #csv file title name
         self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
+        #logging variables
+        self.reward = 0
+        self.log = csv.writer()
+
+        #logging
+        with open(self.trial_parameters+'.csv', 'wb') as log_file:
+            log = csv.writer(log_file)
+            #log.writerow("\n-----------------------------------")
+            log.writerow(("Net-Reward", "Reached"))
+
+
+
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
+        self.reward = 0
 
     #intialize all possible actions for a particular state in the Q-table.  Set = 0
     def init_Q_Values (self, state):
@@ -72,6 +87,7 @@ class LearningAgent(Agent):
 
         # Execute action and get reward
         reward = self.env.act(self, action)
+        self.reward += reward
 
         # TODO: Learn policy based on state, action, reward
 
@@ -85,12 +101,17 @@ class LearningAgent(Agent):
         if state_2 not in self.Q_table:
             self.init_Q_Values(state_2)
 
+        #Q-Learning, Simple, First Pass
+        self.Q_table[self.state][action] = (1-self.alpha) * self.Q_table[self.state][action] \
+                                           + self.alpha * (reward + self.MAX_Q(state_2))
+
 
         # Q-learning
-        self.Q_table[self.state][action] = (1-self.alpha) * self.Q_table[self.state][action] \
-                                           + self.alpha * (reward + self.gamma * self.MAX_Q(state_2))
+        #self.Q_table[self.state][action] = (1-self.alpha) * self.Q_table[self.state][action] \
+        #                                   + self.alpha * (reward + self.gamma * self.MAX_Q(state_2))
 
-
+        if self.env.reached is not None:
+            log.writerow(reward, self.env.reached)
 
 
         #print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
@@ -110,17 +131,16 @@ def run():
     sim = Simulator(e, update_delay=0.0, display=False)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials=1000)  # run for a specified number of trials
+    sim.run(n_trials=100)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
 
-    #logging
-    with open('smartCabLog.txt', 'ab') as log:
-        log.write("\n-----------------------------------")
-        log.write("\nAlpha is set to {}".format(a.alpha))
-        log.write("\nGamma is set to {}".format(a.gamma))
-        log.write("\nThe agent FAILED : {} times".format(e.agent_ran_out_time))
-        log.write("\nThe agent SUCCEEDED : {} times".format(e.agent_reached_in_time))
-        log.write("\nSuccess rate of : {}".format(e.agent_reached_in_time/float(e.agent_reached_in_time+e.agent_ran_out_time)))
+
+        #log.writerow("\nGamma is set to {}".format(a.gamma))
+        #log.writerow("\nThe agent FAILED : {} times".format(e.agent_ran_out_time))
+        #log.writerow("\nThe agent SUCCEEDED : {} times".format(e.agent_reached_in_time))
+        #log.writerow("\nSuccess rate of : {}".format(e.agent_reached_in_time/float(e.agent_reached_in_time+e.agent_ran_out_time)))
+        #log.write("\nNet reward ")
+
 
 
 if __name__ == '__main__':
