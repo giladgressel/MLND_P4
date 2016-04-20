@@ -28,13 +28,11 @@ class LearningAgent(Agent):
         self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
         #logging variables
         self.reward = 0
-        self.log = csv.writer()
 
         #logging
-        with open(self.trial_parameters+'.csv', 'wb') as log_file:
-            log = csv.writer(log_file)
-            #log.writerow("\n-----------------------------------")
-            log.writerow(("Net-Reward", "Reached"))
+        self.file = open(self.trial_parameters+'.csv', 'wb')
+        self.log = csv.writer(self.file)
+        self.log.writerow(("Net-Reward", "Reached"))
 
 
 
@@ -141,6 +139,8 @@ def run():
         #log.writerow("\nSuccess rate of : {}".format(e.agent_reached_in_time/float(e.agent_reached_in_time+e.agent_ran_out_time)))
         #log.write("\nNet reward ")
 
+    #close the log file
+    a.file.close()
 
 
 if __name__ == '__main__':
