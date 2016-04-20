@@ -18,23 +18,12 @@ class LearningAgent(Agent):
         self.Q_table = {}
         self.valid_actions = self.env.valid_actions
 
+        #Q-learning parameters -- pulled from env, because I intialized them there for the logger, csv file name.
+        self.alpha = env.alpha
+        self.gamma = env.gamma
 
-        #Q learning parameters
-        self.gamma = .05
-        self.alpha = .5
-
-
-        #csv file title name
-        self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
         #logging variables
         self.reward = 0
-
-        #logging
-        self.file = open(self.trial_parameters+'.csv', 'wb')
-        self.log = csv.writer(self.file)
-        self.log.writerow(("Net-Reward", "Reached"))
-
-
 
 
     def reset(self, destination=None):
@@ -108,8 +97,7 @@ class LearningAgent(Agent):
         #self.Q_table[self.state][action] = (1-self.alpha) * self.Q_table[self.state][action] \
         #                                   + self.alpha * (reward + self.gamma * self.MAX_Q(state_2))
 
-        if self.env.reached is not None:
-            log.writerow(reward, self.env.reached)
+
 
 
         #print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
@@ -140,7 +128,7 @@ def run():
         #log.write("\nNet reward ")
 
     #close the log file
-    a.file.close()
+    e.file.close()
 
 
 if __name__ == '__main__':

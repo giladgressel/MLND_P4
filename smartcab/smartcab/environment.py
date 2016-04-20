@@ -1,6 +1,7 @@
 import time
 import random
 from collections import OrderedDict
+import csv
 
 from simulator import Simulator
 
@@ -39,6 +40,19 @@ class Environment(object):
 
         #reached or not, for logger
         self.reached = None
+        self.results = (0, 0)
+
+        #logging
+        #Q learning parameters
+        self.gamma = .05
+        self.alpha = .5
+
+        #csv file title name
+        self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
+
+        self.file = open(self.trial_parameters+'.csv', 'ab')
+        self.log = csv.writer(self.file)
+        self.log.writerow(("Net-Reward", "Reached"))
 
         # Road network
         self.grid_size = (8, 6)  # (cols, rows)
@@ -129,6 +143,13 @@ class Environment(object):
                 print "Environment.step(): Primary agent ran out of time! Trial aborted."
                 self.reached = 0
             self.agent_states[self.primary_agent]['deadline'] = agent_deadline - 1
+
+            if self.reached is not None:
+                #print "AGENT REACHED THE DESTINATION!!!{}".format(self.reached)
+                #print "this are the log values I want to write : {}".format((self.primary_agent.reward, self.reached))
+                self.log.writerow([self.primary_agent.reward, self.reached])
+
+
 
     def sense(self, agent):
         assert agent in self.agent_states, "Unknown agent!"
