@@ -32,7 +32,7 @@ class Environment(object):
     valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # ENWS
     hard_time_limit = -100  # even if enforce_deadline is False, end trial when deadline reaches this value (to avoid deadlocks)
 
-    def __init__(self):
+    def __init__(self, alpha=None, gamma=None):
         self.done = False
         self.t = 0
         self.agent_states = OrderedDict()
@@ -44,8 +44,8 @@ class Environment(object):
 
         #logging
         #Q learning parameters
-        self.gamma = .05
-        self.alpha = .5
+        self.gamma = gamma if not None else 0.9
+        self.alpha = alpha if not None else 0.5
 
         #csv file title name
         self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
