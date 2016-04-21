@@ -48,7 +48,7 @@ class Environment(object):
         self.alpha = alpha if not None else 0.5
 
         #csv file title name
-        self.trial_parameters = "Gamma={}_Alpha={}".format(self.gamma,self.alpha)
+        self.trial_parameters = "Gamma={}_Alpha={}".format(self.alpha,self.gamma)
 
         self.file = open(self.trial_parameters+'.csv', 'ab')
         self.log = csv.writer(self.file)
