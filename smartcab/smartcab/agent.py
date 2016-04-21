@@ -3,6 +3,7 @@ from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
 import csv
+import numpy as np
 
 
 class LearningAgent(Agent):
@@ -50,6 +51,11 @@ class LearningAgent(Agent):
     def MAX_Q (self, state):
         return max(self.Q_table[state].values())
 
+    def eplison_greedy(self, state, epsilon = 0.01):  #used to make random actions occasionaly, increase exploration.
+        if np.random.random() > epsilon:  #random is a float between [0,1).  If we set eplison low, then we get restarts very occasionally.
+            return self.ArgMAX_Q(state)
+        else:
+            return random.choice(self.valid_actions)
 
 
     def update(self, t):
@@ -71,7 +77,7 @@ class LearningAgent(Agent):
         # TODO: Select action according to your policy
         # random_action = random.choice(self.env.valid_actions[1:])
 
-        action = self.ArgMAX_Q(self.state)
+        action = self.eplison_greedy(self.state)
 
 
         # Execute action and get reward
