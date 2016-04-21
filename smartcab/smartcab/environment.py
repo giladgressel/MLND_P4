@@ -41,6 +41,8 @@ class Environment(object):
         #reached or not, for logger
         self.reached = None
         self.results = (0, 0)
+        #variable to normalize the net rewards by.
+        self.distance_to_goal = 0
 
         #logging
         #Q learning parameters
@@ -48,9 +50,9 @@ class Environment(object):
         self.alpha = alpha if not None else 0.5
 
         #csv file title name
-        self.trial_parameters = "Gamma={}_Alpha={}".format(self.alpha,self.gamma)
+        self.trial_parameters = "Alpha={}_Gamma={}".format(self.alpha,self.gamma)
 
-        self.file = open(self.trial_parameters+'.csv', 'ab')
+        self.file = open(self.trial_parameters+'.csv', 'wb')
         self.log = csv.writer(self.file)
         self.log.writerow(("Net-Reward", "Reached"))
 
@@ -110,6 +112,8 @@ class Environment(object):
         start_heading = random.choice(self.valid_headings)
         deadline = self.compute_dist(start, destination) * 5
         print "Environment.reset(): Trial set up with start = {}, destination = {}, deadline = {}".format(start, destination, deadline)
+        self.distance_to_goal = self.compute_dist(start, destination)
+
 
         # Initialize agent(s)
         for agent in self.agent_states.iterkeys():
@@ -147,7 +151,8 @@ class Environment(object):
             if self.reached is not None:
                 #print "AGENT REACHED THE DESTINATION!!!{}".format(self.reached)
                 #print "this are the log values I want to write : {}".format((self.primary_agent.reward, self.reached))
-                self.log.writerow([self.primary_agent.reward, self.reached])
+                normalized_reward = self.primary_agent.reward / float(self.distance_to_goal) #this way, the value for a reward is normalized against the distance of the trip
+                self.log.writerow([normalized_reward, self.reached])
 
 
 

@@ -39,7 +39,9 @@ class LearningAgent(Agent):
     #for the current state, iterates over all possible actions and returns the action which maximizes the Q value
     def ArgMAX_Q (self, state):
         #if the sum of the values is greater than 0, then there is an entry, so choose the max
-        if sum(self.Q_table[state].values()) != 0:
+        #if sum(self.Q_table[state].values()) != 0:
+        for value in self.Q_table[state].values():  # this is will check each value, if any of them has a value then we've been to this state before and can do argmax.  Otherwise we go below
+            if value != 0:
                return max(self.Q_table[state].iteritems(), key= lambda x : x[1])[0]
         else: #otherwise, just pick a random action.  We have to force this because max doesn't randomly break ties, it will choose the same option again and again for different unseen states.
             return random.choice(self.valid_actions)
@@ -133,4 +135,4 @@ def run(alpha, gamma):
 
 
 if __name__ == '__main__':
-    run(0.1, 0.3)
+    run(0.5, 0.9)
