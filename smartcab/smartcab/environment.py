@@ -38,6 +38,11 @@ class Environment(object):
         self.agent_states = OrderedDict()
         self.status_text = ""
 
+
+        ###############################################
+        ###############################################
+        ###############################################
+##########################################
         #reached or not, for logger
         self.reached = None
         self.results = (0, 0)
@@ -51,10 +56,14 @@ class Environment(object):
 
         #csv file title name
         self.trial_parameters = "Alpha={}_Gamma={}".format(self.alpha,self.gamma)
-
-        self.file = open(self.trial_parameters+'.csv', 'wb')
+        self.file = open(self.trial_parameters+'1000.csv', 'wb')
         self.log = csv.writer(self.file)
         self.log.writerow(("Net-Reward", "Reached"))
+##########################################
+        ###############################################
+        ###############################################
+        ###############################################
+
 
         # Road network
         self.grid_size = (8, 6)  # (cols, rows)
@@ -94,7 +103,10 @@ class Environment(object):
     def reset(self):
         self.done = False
         self.t = 0
+###############################################
         self.reached = None  #logger variable
+###############################################
+
 
         # Reset traffic lights
         for traffic_light in self.intersections.itervalues():
@@ -112,8 +124,9 @@ class Environment(object):
         start_heading = random.choice(self.valid_headings)
         deadline = self.compute_dist(start, destination) * 5
         print "Environment.reset(): Trial set up with start = {}, destination = {}, deadline = {}".format(start, destination, deadline)
+        ###############################################
         self.distance_to_goal = self.compute_dist(start, destination)
-
+        ###############################################
 
         # Initialize agent(s)
         for agent in self.agent_states.iterkeys():
@@ -141,19 +154,27 @@ class Environment(object):
             if agent_deadline <= self.hard_time_limit:
                 self.done = True
                 print "Environment.step(): Primary agent hit hard time limit ({})! Trial aborted.".format(self.hard_time_limit)
+                ###############################################
                 self.reached = 0
+                ###############################################
             elif self.enforce_deadline and agent_deadline <= 0:
                 self.done = True
                 print "Environment.step(): Primary agent ran out of time! Trial aborted."
+                ###############################################
                 self.reached = 0
+                ###############################################
             self.agent_states[self.primary_agent]['deadline'] = agent_deadline - 1
+
+###############################################
+            ###############################################
 
             if self.reached is not None:
                 #print "AGENT REACHED THE DESTINATION!!!{}".format(self.reached)
                 #print "this are the log values I want to write : {}".format((self.primary_agent.reward, self.reached))
                 normalized_reward = self.primary_agent.reward / float(self.distance_to_goal) #this way, the value for a reward is normalized against the distance of the trip
                 self.log.writerow([normalized_reward, self.reached])
-
+###############################################
+            ###############################################
 
 
     def sense(self, agent):
